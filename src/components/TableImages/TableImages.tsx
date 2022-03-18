@@ -50,7 +50,7 @@ const columns: readonly Column[] = [
   }
 ];
 
-export default function StickyHeadTable(props: {images: ImageProps[], status: number[]}) {
+export default function TableImages(props: {images: ImageProps[], status: number[]}) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   
@@ -67,7 +67,7 @@ export default function StickyHeadTable(props: {images: ImageProps[], status: nu
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: '70vh' }}>
+      <TableContainer sx={{ maxHeight: '85vh' }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>

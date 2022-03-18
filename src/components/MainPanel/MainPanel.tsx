@@ -1,10 +1,11 @@
 import * as React from 'react';
-import {ImageProps} from '../../utils/types'
-import TableImages from '../TableImages';
-import Button from '@mui/material/Button';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
+
+import Button from '@mui/material/Button';
+
 import StatusDialog from '../TableImages/StatusDialog';
+import {ImageProps} from '../../utils/types'
 
 async function delay(milliseconds: number) {
   return new Promise<void>((resolve) => {
@@ -24,7 +25,6 @@ export default function MainPanel(props: {images: ImageProps[], status: number[]
   async function download(image: ImageProps, num: number, i : number) {
     let url = num === 0? image.image_0: num === 1? image.image_1:image.image_2;
     let filename = image.id + "_image_" + num + url.slice(url.lastIndexOf('/'));
-    await delay(500);
     axios.get(url, {
       responseType: 'blob',
     })
@@ -37,6 +37,7 @@ export default function MainPanel(props: {images: ImageProps[], status: number[]
       updatedStatus[i] = 3;
       setStatus({...status, ...updatedStatus});
     });
+    await delay(500);
   }
 
   async function handleDownloadImages() {
@@ -66,21 +67,18 @@ export default function MainPanel(props: {images: ImageProps[], status: number[]
 
   return (
     <div>
-      <div>
-        <Button variant="contained" className='pushbutton' sx={{margin: '30px'}}
-          onClick={handleDownloadImages}
-        >
-          Download
-        </Button>
-        <StatusDialog
-          openDialog={openDialog}
-          setOpenDialog={setOpenDialog}
-          retryDownload={handleRetryDownloadImages}
-          images={props.images}
-          status={props.status}
-        />
-      </div>
-      
+      <Button variant="contained" className='pushbutton' sx={{margin: '30px'}}
+        onClick={handleDownloadImages}
+      >
+        Download
+      </Button>
+      <StatusDialog
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        retryDownload={handleRetryDownloadImages}
+        images={props.images}
+        status={props.status}
+      />
     </div>
   );
 }
