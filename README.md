@@ -3,7 +3,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 ## How to use
 
-1. Clone or download the repo from: https://github.com/RichForest0506/React-image-downloader
+1. Clone or download the repo from: https://github.com/amardeepsingh20/image-downloader
 2. Install npm:
 ### `npm i`
 3. Install Material UI:
