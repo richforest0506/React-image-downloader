@@ -7,12 +7,10 @@ import MainPanel from './components/MainPanel';
 function createData (
   id: string,
   setId: number,
-  image_0: string,
-  image_1: string,
-  image_2: string,
+  imageUrls: string[],
   createdAt: string,
 ): ImageProps {
-  return {id, setId, image_0, image_1, image_2, createdAt};
+  return {id, setId, imageUrls, createdAt};
  
 }
 
@@ -24,10 +22,12 @@ function initData() {
   status = [];
   for (let i = 0; i < arr.length; i += 1) {
     const data = arr[i];
-    images.push(createData(data.id, data.setId, data.image_0, data.image_1, data.image_2, data.createdAt));
-    status.push(0, 0, 0);
+    var imageUrls:string[] = Object.values(data).filter(item => String(item).includes('https://')) as string [];
+    images.push(createData(data.id, data.setId, imageUrls, data.createdAt));
+    for (let j = 0; j<imageUrls.length; j++)
+    status.push(0);
   }
-
+  console.log(images);
 }
 
 function App() {
@@ -42,3 +42,4 @@ function App() {
 }
 
 export default App;
+

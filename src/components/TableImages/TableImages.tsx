@@ -8,47 +8,39 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import {ImageProps} from '../../utils/types'
-import './style.scss';
 
-interface Column {
-  id: 'id' | 'setId' | 'image_0' | 'image_1' | 'image_2' | 'createdAt';
-  label: string;
-  minWidth?: number;
-  align?: 'left' | 'center' | 'right';
-  format?: (value: number) => string;
-}
+// interface Column {
+//   id: 'id' | 'image_0' | 'image_1' | 'image_2';
+//   label: string;
+//   minWidth?: number;
+//   align?: 'left' | 'center' | 'right';
+//   format?: (value: number) => string;
+// }
 
-const columns: readonly Column[] = [
-  { id: 'id', label: 'Id', minWidth: 30 },
-  { id: 'setId', label: 'SetId', minWidth: 50 },
-  {
-    id: 'image_0',
-    label: 'Image_0',
-    minWidth: 100,
-    align: 'center',
-    format: (value: number) => value.toLocaleString('en-US'),
-  }, 
-  {
-    id: 'image_1',
-    label: 'Image_1',
-    minWidth: 100,
-    align: 'center',
-    format: (value: number) => value.toLocaleString('en-US'),
-  }, 
-  {
-    id: 'image_2',
-    label: 'Image_2',
-    minWidth: 100,
-    align: 'center',
-    format: (value: number) => value.toLocaleString('en-US'),
-  }, 
-  {
-    id: 'createdAt',
-    label: 'CreatedAt',
-    minWidth: 120,
-    align: 'center',    
-  }
-];
+// const columns: readonly Column[] = [
+//   { id: 'id', label: 'Id', minWidth: 30 },
+//   {
+//     id: 'image_0',
+//     label: 'Image_0',
+//     minWidth: 100,
+//     align: 'center',
+//     format: (value: number) => value.toLocaleString('en-US'),
+//   }, 
+//   {
+//     id: 'image_1',
+//     label: 'Image_1',
+//     minWidth: 100,
+//     align: 'center',
+//     format: (value: number) => value.toLocaleString('en-US'),
+//   }, 
+//   {
+//     id: 'image_2',
+//     label: 'Image_2',
+//     minWidth: 100,
+//     align: 'center',
+//     format: (value: number) => value.toLocaleString('en-US'),
+//   }
+// ];
 
 export default function TableImages(props: {images: ImageProps[], status: number[]}) {
   const [page, setPage] = React.useState(0);
@@ -71,13 +63,20 @@ export default function TableImages(props: {images: ImageProps[], status: number
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
+              <TableCell
+                align={'center'}
+                style={{ minWidth: 50 }}
+              >
+                Id
+              </TableCell>
+
+              {images[0]["imageUrls"].map((url, colIndex) => (
                 <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  align={'center'}
+                  style={{ minWidth: 100 }}
+                  key={colIndex}
                 >
-                  {column.label}
+                  {"Image_" +  colIndex}
                 </TableCell>
               ))}
             </TableRow>
@@ -88,35 +87,27 @@ export default function TableImages(props: {images: ImageProps[], status: number
               .map((row, rowIndex) => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={rowIndex}>
-                    {columns.map((column, colIndex) => {
-
-                        let value = row[column.id];
-                        let statusId = (page * rowsPerPage + rowIndex) * 3 + colIndex - 2;
-                        if (column.id === 'image_0' || column.id === 'image_1' || column.id === 'image_2') {
-                          return (
-                            <TableCell key={colIndex} align={column.align}>
-                              <img src={value as string} style={{width: "50px", height: "50px"}} alt="img"/>
-                              <p>
-                                {props.status[statusId] === 1 && "Downloading"}
-                                {props.status[statusId] === 2 && "Finished"}
-                                {props.status[statusId] === 3 && "Failed"}
-                                {props.status[statusId] !== 1 
-                                    && props.status[statusId] !== 2 
-                                    && props.status[statusId] !== 3 && "Queued"}                                  
-                              </p>
-                            </TableCell>
-                          );
-                        }
-                        else {
-                          return (
-                            <TableCell key={colIndex} align={column.align}>
-                              {column.format && typeof value === 'number'
-                                  ? column.format(value) : value}
-                            </TableCell>
-                          );
-                        }
-                      }                     
-                    )}
+                    <TableCell
+                      align={'center'}
+                    >
+                      {row["id"]}
+                    </TableCell>
+                    {row["imageUrls"].map((url, colIndex) => (
+                      <TableCell key={colIndex}
+                        align={'center'}
+                      >
+                        <img src={url as string} style={{width: "50px", height: "50px"}} alt="img"/>
+                        <p>
+                          {props.status[(page * rowsPerPage + rowIndex) * row["imageUrls"].length + colIndex] === 1 && "Downloading"}
+                          {props.status[(page * rowsPerPage + rowIndex) * row["imageUrls"].length + colIndex] === 2 && "Finished"}
+                          {props.status[(page * rowsPerPage + rowIndex) * row["imageUrls"].length + colIndex] === 3 && "Failed"}
+                          {props.status[(page * rowsPerPage + rowIndex) * row["imageUrls"].length + colIndex] !== 1 
+                              && props.status[(page * rowsPerPage + rowIndex) * row["imageUrls"].length + colIndex] !== 2 
+                              && props.status[(page * rowsPerPage + rowIndex) * row["imageUrls"].length + colIndex] !== 3 && "Queued"}                                  
+                        </p>
+                      </TableCell>
+                    ))}
+                   
                   </TableRow>
                 );
               })}

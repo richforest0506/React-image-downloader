@@ -15,53 +15,70 @@ async function delay(milliseconds: number) {
 
 var updatedStatus: number[];
 
-export default function MainPanel(props: {images: ImageProps[], status: number[]}) {
+export default function MainPanel(
+    props: {
+      images: ImageProps[], 
+      status: number[]
+    }
+  ) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [status, setStatus] = React.useState([0]);
+  const [progress, setProgress] = React.useState(0);
   var images = props.images;  
   
   updatedStatus = props.status;
 
   async function download(image: ImageProps, num: number, i : number) {
-    let url = num === 0? image.image_0: num === 1? image.image_1:image.image_2;
+    let url = image.imageUrls[num];
     let filename = image.id + "_image_" + num + url.slice(url.lastIndexOf('/'));
+    if (localStorage.getItem(filename) == "downloaded") {
+      updatedStatus[i] = 2;
+      setStatus({...status, ...updatedStatus});
+      return;
+    }      
     axios.get(url, {
       responseType: 'blob',
     })
     .then((res : any) => {
         fileDownload(res.data, filename);
         updatedStatus[i] = 2;
+        localStorage.setItem(filename, "downloaded");
         setStatus({...status, ...updatedStatus});
     })
     .catch(function (error: any) {
       updatedStatus[i] = 3;
       setStatus({...status, ...updatedStatus});
     });
-    await delay(500);
+    await delay(500);    
   }
 
   async function handleDownloadImages() {
     setOpenDialog(true);
+  };
+
+  async function handleStartDownloadImages() {
     for (let i=0; i<images.length; i++) {
-      for (let j=0; j<3; j++) {       
-        if (updatedStatus[i * 3 + j] === 2)
+      for (let j=0; j<images[i].imageUrls.length; j++) {       
+        if (updatedStatus[i * images[i].imageUrls.length + j] === 2)
           continue;
-        updatedStatus[i * 3 + j] = 1;
+        updatedStatus[i * images[i].imageUrls.length + j] = 1;
         setStatus({...status, ...updatedStatus});
-        await download(images[i], j, i * 3 + j);
+        await download(images[i], j, i * images[i].imageUrls.length + j);
       }
+      setProgress(i + 1);
     }
   };
 
   async function handleRetryDownloadImages() {
     for (let i=0; i<images.length; i++) {
-      for (let j=0; j<3; j++) {       
-        if (updatedStatus[i * 3 + j] === 2)
+      for (let j=0; j<images[i].imageUrls.length; j++) {       
+        if (updatedStatus[i * images[i].imageUrls.length + j] === 2)
           continue;
-        updatedStatus[i * 3 + j] = 1;
+        updatedStatus[i * images[i].imageUrls.length + j] = 1;
         setStatus({...status, ...updatedStatus});
-        await download(images[i], j, i * 3 + j);
+        await download(images[i], j, i * images[i].imageUrls.length + j);
       }
+      setProgress(i + 1);
     }
   };
 
@@ -75,9 +92,11 @@ export default function MainPanel(props: {images: ImageProps[], status: number[]
       <StatusDialog
         openDialog={openDialog}
         setOpenDialog={setOpenDialog}
+        startDownload={handleStartDownloadImages}
         retryDownload={handleRetryDownloadImages}
         images={props.images}
         status={props.status}
+        progress = {progress}
       />
     </div>
   );

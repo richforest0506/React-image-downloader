@@ -8,11 +8,14 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
+import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
+import Box from '@mui/material/Box';
 import { TransitionProps } from '@mui/material/transitions';
 
 import TableImages from './TableImages'
 
 import {ImageProps} from '../../utils/types'
+import { DialogActions } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -23,11 +26,39 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function StatusDialog(props: {openDialog:boolean, setOpenDialog:any, retryDownload:any, images: ImageProps[], status:number[]}) {
+function LinearProgressWithLabel(props: LinearProgressProps & { value: number , amount: number}) {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center' , mt:3}}>
+      <Box sx={{ width: '100%', mr: 2 , ml: 2}}>
+        <LinearProgress variant="determinate" value = { (props.value / props.amount) * 100} />
+      </Box>
+      <Box sx={{ minWidth: 60 }}>
+        <Typography>
+          {props.value + " / " + props.amount}
+        </Typography>        
+      </Box>
+    </Box>
+  );
+}
+
+export default function StatusDialog(
+    props: {
+      openDialog:boolean, 
+      setOpenDialog:any, 
+      startDownload:any, 
+      retryDownload:any, 
+      images: ImageProps[], 
+      status:number[],
+      progress:number
+    }
+  ) {
   const handleClose = () => {
     props.setOpenDialog(false);
   };
 
+  const handleStart = () => {
+    props.startDownload();
+  }
   const handleRetry = () => {
     props.retryDownload();
   }
@@ -52,14 +83,20 @@ export default function StatusDialog(props: {openDialog:boolean, setOpenDialog:a
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
               Downloading Status
             </Typography>
-            <Button autoFocus color="inherit" onClick={handleRetry}>
-              Retry failed items
-            </Button>
+            
           </Toolbar>
         </AppBar>
-        <div>
-          <TableImages images={props.images} status={props.status}/>
-        </div>
+        
+        <TableImages images={props.images} status={props.status}/>
+        <LinearProgressWithLabel value={props.progress} amount={props.images.length} />
+        <DialogActions>
+            <Button autoFocus variant="contained" onClick={handleStart}>
+              Start
+            </Button>
+            <Button variant="contained" onClick={handleRetry}>
+              Retry failed items
+            </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );
